@@ -18,16 +18,27 @@ class TodoStore extends ReduceStore {
     switch (action.type) {
       case TodoActionTypes.ADD_TODO:
         if (!action.text) {
-            return state;
+          return state;
         }
 
         const id = Counter.increment();
         return state.set(id, new Todo({
-            id,
-            text: action.text,
-            complete: false
+          id,
+          text: action.text,
+          complete: false
         }));
-
+      case TodoActionTypes.DELETE_COMPLETED_TODOS:
+        return state.filter(todo => !todo.complete);
+      case TodoActionTypes.DELETE_TODO:
+        return state.delete(action.id);
+      case TodoActionTypes.TOGGLE_ALL_TODOS:
+        const areAllComplete = state.every(todo => todo.complete);
+        return state.map(todo => todo.set('complete', !areAllComplete));
+      case TodoActionTypes.TOGGLE_TODO:
+        return state.update(
+          action.id,
+          todo => todo.set('complete', !todo.complete),
+        );
       default:
         return state;
     }
